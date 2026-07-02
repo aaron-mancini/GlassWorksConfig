@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- The core library is plain .NET (no WPF dependency) so that the pricing
+         and BOM services can be unit-tested on any OS and reused outside WPF. -->
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>GlassWorks.Core</RootNamespace>
+
+    <!-- VB idiom: these compiler options replace C#'s always-on strictness.
+         Option Strict On  = no implicit narrowing conversions / late binding
+                             (closest to normal C# semantics - always turn it on).
+         Option Explicit On = variables must be declared before use.
+         Option Infer On    = local type inference ('Dim x = 1' works like 'var'). -->
+    <OptionStrict>On</OptionStrict>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+
+</Project>

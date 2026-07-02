@@ -1,0 +1,16 @@
+<!--
+  Custom UserControl hosting the live 2D drawing of the configured unit.
+  The XAML is deliberately minimal - the drawing itself is generated in the
+  code-behind. That is NOT a violation of MVVM: rendering geometry from a
+  model is *presentation* logic and belongs to the view layer. The control
+  knows nothing about ViewModels; it exposes a single dependency property
+  (Unit) of the plain model type, which MainWindow binds to the ViewModel's
+  CurrentUnit snapshot.
+-->
+<UserControl x:Class="Controls.WindowPreviewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid ClipToBounds="True">
+        <Canvas x:Name="DrawCanvas" Background="Transparent" />
+    </Grid>
+</UserControl>

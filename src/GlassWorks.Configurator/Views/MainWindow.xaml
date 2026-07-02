@@ -1,0 +1,348 @@
+<!--
+  Main (and only) window. Pure declarative view: every piece of behavior is a
+  {Binding} to MainViewModel - there are no event handlers in the code-behind.
+
+  VB idiom reminder: x:Class is relative to the project root namespace, so
+  "Views.MainWindow" compiles to GlassWorks.Configurator.Views.MainWindow.
+  The clr-namespace xmlns declarations, in contrast, always use the FULL
+  namespace (they are CLR references, not XAML-compiler references).
+-->
+<Window x:Class="Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctrl="clr-namespace:GlassWorks.Configurator.Controls"
+        xmlns:conv="clr-namespace:GlassWorks.Configurator.Converters"
+        xmlns:vm="clr-namespace:GlassWorks.Configurator.ViewModels"
+        Title="GlassWorks Configurator"
+        Width="1320" Height="840"
+        MinWidth="1150" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI"
+        FontSize="12.5"
+        TextOptions.TextFormattingMode="Display"
+        Background="{StaticResource AppBackgroundBrush}">
+
+    <Window.Resources>
+        <conv:EnumDescriptionConverter x:Key="EnumDescription" />
+        <conv:TintToBrushConverter x:Key="TintToBrush" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- DataTemplate used by every enum ComboBox: show the friendly
+             Description text while SelectedItem stays the enum value. -->
+        <DataTemplate x:Key="EnumItemTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource EnumDescription}}" />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ======================= Header bar ======================= -->
+        <Border Grid.Row="0" Background="{StaticResource HeaderBarBrush}" Padding="18,12">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="GLASSWORKS" FontSize="17" FontWeight="Bold"
+                               Foreground="{StaticResource HeaderAccentBrush}" />
+                    <TextBlock Text=" CONFIGURATOR" FontSize="17" FontWeight="Light"
+                               Foreground="{StaticResource HeaderTextBrush}" />
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Text="Parametric window &amp; glass unit quoting"
+                           FontSize="12" Foreground="#FF94A3B8" />
+            </DockPanel>
+        </Border>
+
+        <!-- ======================= Workspace ======================= -->
+        <Grid Grid.Row="1" Margin="14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="330" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="380" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="250" />
+            </Grid.RowDefinitions>
+
+            <!-- =============== Configurator panel (left) =============== -->
+            <Border Style="{StaticResource Card}" Grid.Column="0" Grid.RowSpan="2" Margin="0,0,12,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+
+                        <TextBlock Text="UNIT" Style="{StaticResource SectionHeaderText}" />
+                        <DockPanel Margin="0,0,0,14">
+                            <TextBlock Text="Material" Style="{StaticResource FieldLabelText}" Width="80" />
+                            <ComboBox ItemsSource="{x:Static vm:EnumCatalog.FrameMaterials}"
+                                      SelectedItem="{Binding FrameMaterial}"
+                                      ItemTemplate="{StaticResource EnumItemTemplate}" />
+                        </DockPanel>
+
+                        <TextBlock Text="LITES (LEFT TO RIGHT)" Style="{StaticResource SectionHeaderText}" />
+                        <!-- DataTemplate requirement in action: each LiteViewModel
+                             renders as a selectable chip. -->
+                        <ListBox Style="{StaticResource LiteChipList}"
+                                 ItemsSource="{Binding Lites}"
+                                 SelectedItem="{Binding SelectedLite}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="11.5" />
+                                        <TextBlock Text="{Binding SummaryText}" FontSize="10.5"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,14">
+                            <Button Content="+ Add lite" Style="{StaticResource SubtleButton}"
+                                    Command="{Binding AddLiteCommand}" Margin="0,0,6,0" />
+                            <Button Content="Remove selected" Style="{StaticResource DangerButton}"
+                                    Command="{Binding RemoveLiteCommand}" />
+                        </StackPanel>
+
+                        <TextBlock Text="SELECTED LITE" Style="{StaticResource SectionHeaderText}" />
+
+                        <!-- The editor re-targets its DataContext at the selected
+                             lite; every field below binds to LiteViewModel. -->
+                        <StackPanel DataContext="{Binding SelectedLite}">
+
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Frame type" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <ComboBox ItemsSource="{x:Static vm:EnumCatalog.FrameTypes}"
+                                          SelectedItem="{Binding FrameType}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}" />
+                            </DockPanel>
+
+                            <!-- Width / height with IDataErrorInfo validation:
+                                 ValidatesOnDataErrors asks the ViewModel after each
+                                 update; Delay debounces repricing while typing. -->
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Width (in)" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <TextBox Text="{Binding WidthInches, UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnDataErrors=True, Delay=300, StringFormat=0.##}" />
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,4">
+                                <TextBlock Text="Height (in)" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <TextBox Text="{Binding HeightInches, UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnDataErrors=True, Delay=300, StringFormat=0.##}" />
+                            </DockPanel>
+
+                            <TextBlock Text="{Binding SizeRangeHint}" Style="{StaticResource HintText}"
+                                       Margin="90,0,0,10" />
+
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Glass" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <ComboBox ItemsSource="{x:Static vm:EnumCatalog.GlassTypes}"
+                                          SelectedItem="{Binding GlassType}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}" />
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Tint" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <!-- Value-converter requirement in action: the swatch
+                                     paints the selected tint via TintToBrushConverter. -->
+                                <Border DockPanel.Dock="Right" Width="26" Height="26" Margin="6,0,0,0"
+                                        CornerRadius="5" BorderBrush="{StaticResource InputBorderBrush}"
+                                        BorderThickness="1"
+                                        Background="{Binding Tint, Converter={StaticResource TintToBrush}}" />
+                                <ComboBox ItemsSource="{x:Static vm:EnumCatalog.GlassTints}"
+                                          SelectedItem="{Binding Tint}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}" />
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,8">
+                                <TextBlock Text="Grid" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <ComboBox ItemsSource="{x:Static vm:EnumCatalog.GridPatterns}"
+                                          SelectedItem="{Binding GridPattern}"
+                                          ItemTemplate="{StaticResource EnumItemTemplate}" />
+                            </DockPanel>
+
+                            <!-- Only relevant for colonial grids; collapses otherwise. -->
+                            <DockPanel Margin="0,0,0,8"
+                                       Visibility="{Binding IsColonial, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="Rows × cols" Style="{StaticResource FieldLabelText}" Width="80" />
+                                <TextBox Width="52" Text="{Binding GridRows, UpdateSourceTrigger=PropertyChanged,
+                                                                   ValidatesOnDataErrors=True, Delay=300}" />
+                                <TextBlock Text="×" Margin="8,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBox Width="52" HorizontalAlignment="Left"
+                                         Text="{Binding GridColumns, UpdateSourceTrigger=PropertyChanged,
+                                                        ValidatesOnDataErrors=True, Delay=300}" />
+                            </DockPanel>
+
+                            <!-- Aggregate validation summary (IDataErrorInfo.Error). -->
+                            <TextBlock Text="{Binding Error}" Style="{StaticResource ErrorText}"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- =============== Live preview (center) =============== -->
+            <Border Style="{StaticResource Card}" Grid.Column="1" Grid.Row="0" Margin="0,0,12,12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="LIVE PREVIEW"
+                               Style="{StaticResource SectionHeaderText}" />
+                    <!-- The custom UserControl. Its Unit dependency property is
+                         bound to the ViewModel's immutable snapshot; every edit
+                         replaces the snapshot, which triggers a redraw. -->
+                    <ctrl:WindowPreviewControl Unit="{Binding CurrentUnit}" />
+                </DockPanel>
+            </Border>
+
+            <!-- =============== Pricing / cut list (right) =============== -->
+            <Border Style="{StaticResource Card}" Grid.Column="2" Grid.Row="0" Margin="0,0,0,12"
+                    Padding="14,10,14,14">
+                <TabControl>
+                    <TabItem Header="PRICING">
+                        <DockPanel Margin="0,6,0,0">
+
+                            <!-- Total + add-to-quote pinned at the bottom. -->
+                            <Border DockPanel.Dock="Bottom" Background="{StaticResource PrimaryLightBrush}"
+                                    CornerRadius="8" Padding="12" Margin="0,10,0,0">
+                                <StackPanel>
+                                    <DockPanel>
+                                        <TextBlock Text="Unit price" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Breakdown.Total, StringFormat=C}"
+                                                   HorizontalAlignment="Right" FontSize="20" FontWeight="Bold"
+                                                   Foreground="{StaticResource PrimaryBrush}" />
+                                    </DockPanel>
+                                    <DockPanel Margin="0,10,0,0">
+                                        <TextBlock Text="Qty" Style="{StaticResource FieldLabelText}" />
+                                        <TextBox Width="46" Text="{Binding QuoteQuantity, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button Content="Add to quote" Margin="10,0,0,0"
+                                                Command="{Binding AddToQuoteCommand}" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Itemized, live-updating breakdown. -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Breakdown.Lines}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel Margin="0,3">
+                                                <TextBlock DockPanel.Dock="Right" Margin="8,0,0,0"
+                                                           Text="{Binding Amount, StringFormat=C}"
+                                                           FontWeight="SemiBold" VerticalAlignment="Top"
+                                                           Foreground="{StaticResource TextPrimaryBrush}" />
+                                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
+                                                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </TabItem>
+
+                    <TabItem Header="CUT LIST / BOM">
+                        <DataGrid Margin="0,6,0,0" ItemsSource="{Binding BomItems}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="76" />
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="42" />
+                                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="48" />
+                                <DataGridTextColumn Header="Cut size" Binding="{Binding Dimensions}" Width="110" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+
+            <!-- =============== Quote (bottom, spans preview + pricing) =============== -->
+            <Border Style="{StaticResource Card}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+                <DockPanel>
+
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <TextBlock Text="QUOTE" Style="{StaticResource SectionHeaderText}"
+                                   Margin="0" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding QuoteNumber, StringFormat=· {0}}" FontSize="11"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="8,0,0,0" VerticalAlignment="Center" />
+
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="Grand total:" VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding GrandTotal, StringFormat=C}" FontSize="17" FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center"
+                                       Margin="0,0,18,0" />
+                            <Button Content="New quote" Style="{StaticResource SubtleButton}"
+                                    Command="{Binding NewQuoteCommand}" Margin="0,0,6,0" />
+                            <Button Content="Export CSV" Style="{StaticResource SubtleButton}"
+                                    Command="{Binding ExportCsvCommand}" Margin="0,0,6,0" />
+                            <Button Content="Export text" Style="{StaticResource SubtleButton}"
+                                    Command="{Binding ExportTextCommand}" />
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Auto-save/status feedback line. -->
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusMessage}"
+                               Style="{StaticResource HintText}" Margin="0,6,0,0" />
+
+                    <!-- The quote line items: an ObservableCollection rendered by a
+                         ListView+GridView with per-column cell templates. -->
+                    <ListView Style="{StaticResource QuoteListView}" ItemsSource="{Binding QuoteItems}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Configuration" Width="520">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Qty" Width="64">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <!-- Editing quantity live-updates line + grand totals. -->
+                                            <TextBox Width="44" Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged, Delay=300}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Unit price" Width="96">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding UnitPrice, StringFormat=C}" TextAlignment="Right" Width="76" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Line total" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding LineTotal, StringFormat=C}" TextAlignment="Right"
+                                                       Width="80" FontWeight="SemiBold" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Width="46">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <!-- The row's DataContext is the line item, but the command
+                                                 lives on MainViewModel - reach it via the Window's
+                                                 DataContext with a RelativeSource binding. -->
+                                            <Button Content="✕" Style="{StaticResource DangerButton}"
+                                                    Padding="7,3" FontSize="11"
+                                                    Command="{Binding DataContext.RemoveQuoteItemCommand,
+                                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </Border>
+
+        </Grid>
+    </Grid>
+</Window>

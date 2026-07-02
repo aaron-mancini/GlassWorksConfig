@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- WPF requires the Windows-specific TFM. -->
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>GlassWorks.Configurator</RootNamespace>
+    <AssemblyName>GlassWorksConfigurator</AssemblyName>
+
+    <!-- Allows the project to be *compiled* on macOS/Linux build agents (it can
+         only *run* on Windows). Harmless on Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <OptionStrict>On</OptionStrict>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- All business logic (models, pricing, BOM, persistence) lives in the
+         core library; this project contains only presentation code. -->
+    <ProjectReference Include="..\GlassWorks.Core\GlassWorks.Core.vbproj" />
+  </ItemGroup>
+
+</Project>
