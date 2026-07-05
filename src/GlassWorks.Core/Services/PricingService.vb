@@ -113,7 +113,7 @@ Namespace Services
                 End Select
 
                 ' 4) Screens.
-                If lite.HasScreen Then
+                If lite.HasScreen And FrameTypeCatalog.GetSpec(lite.FrameType).SupportsScreen Then
                     lines.Add(New PriceLine($"{label} screen", CDec(Math.Round(ScreenRatePerSqFt * CDec(lite.AreaSquareFeet), 2))))
                 End If
             Next

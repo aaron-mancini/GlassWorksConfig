@@ -71,7 +71,7 @@ Namespace Services
 
                 ' --- Screen.
                 If lite.HasScreen Then
-                    items.Add(New BomItem(BomCategory.Screen, $"{label} screen mesh — {panelHeight}x{panelWidth}", Math.Round(panelHeight * panelWidth), "sq ft"))
+                    items.Add(New BomItem(BomCategory.Screen, $"{label} screen mesh — {panelWidth}x{panelHeight}", Math.Round(panelWidth * panelHeight), "sq ft"))
                 End If
 
                 ' --- Hardware per frame type.

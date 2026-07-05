@@ -166,7 +166,7 @@ Public Class PricingServiceTests
         Dim resultWith = _service.CalculatePrice(unitWithScreen)
         Dim resultWithout = _service.CalculatePrice(unitWithoutScreen)
 
-        Assert.Equal(resultWith, resultWithout)
+        Assert.Equal(resultWith.Total, resultWithout.Total)
     End Sub
 
 End Class

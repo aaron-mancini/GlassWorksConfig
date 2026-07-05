@@ -47,6 +47,8 @@ Namespace ViewModels
                     OnPropertyChanged(NameOf(WidthInches))
                     OnPropertyChanged(NameOf(HeightInches))
                     OnPropertyChanged(NameOf(SizeRangeHint))
+                    OnPropertyChanged(NameOf(CanHaveScreen))
+                    If CanHaveScreen = False Then HasScreen = False
                     NotifySummaryAndErrorChanged()
                 End If
             End Set
@@ -124,7 +126,7 @@ Namespace ViewModels
             End Get
             Set(value As Boolean)
                 If SetProperty(_hasScreen, value) Then
-                    OnPropertyChanged(NameOf(HasScreen))
+                    OnPropertyChanged(NameOf(CanHaveScreen))
                     NotifySummaryAndErrorChanged()
                 End If
             End Set
@@ -205,7 +207,6 @@ Namespace ViewModels
 
         Public ReadOnly Property CanHaveScreen As Boolean
             Get
-                OnPropertyChanged(NameOf(FrameType))
                 Return FrameTypeCatalog.GetSpec(FrameType).SupportsScreen
             End Get
         End Property
