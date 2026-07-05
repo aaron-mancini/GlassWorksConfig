@@ -21,7 +21,8 @@ Public Class PricingServiceTests
                                            Optional material As FrameMaterial = FrameMaterial.Vinyl,
                                            Optional gridPattern As GridPattern = GridPattern.None,
                                            Optional gridRows As Integer = 2,
-                                           Optional gridColumns As Integer = 2) As WindowUnitConfiguration
+                                           Optional gridColumns As Integer = 2,
+                                           Optional hasScreen As Boolean = False) As WindowUnitConfiguration
         Dim unit As New WindowUnitConfiguration With {.FrameMaterial = material}
         unit.Lites.Add(New LiteConfiguration With {
             .FrameType = frameType,
@@ -31,7 +32,8 @@ Public Class PricingServiceTests
             .Tint = tint,
             .GridPattern = gridPattern,
             .GridRows = gridRows,
-            .GridColumns = gridColumns
+            .GridColumns = gridColumns,
+            .HasScreen = hasScreen
         })
         Return unit
     End Function
@@ -148,6 +150,23 @@ Public Class PricingServiceTests
 
         Assert.Empty(result.Lines)
         Assert.Equal(0D, result.Total)
+    End Sub
+
+    <Fact>
+    Public Sub FixedLite_CannotHaveScreenPrice()
+        Dim unitWithScreen = SingleLiteUnit(frameType:=FrameType.Fixed,
+                                  widthInches:=30, heightInches:=60,
+                                  glassType:=GlassType.SinglePane, tint:=GlassTint.Clear,
+                                  material:=FrameMaterial.Fiberglass, gridPattern:=GridPattern.None,
+                                  hasScreen:=True)
+        Dim unitWithoutScreen = SingleLiteUnit(frameType:=FrameType.Fixed,
+                                  widthInches:=30, heightInches:=60,
+                                  glassType:=GlassType.SinglePane, tint:=GlassTint.Clear,
+                                  material:=FrameMaterial.Fiberglass, gridPattern:=GridPattern.None)
+        Dim resultWith = _service.CalculatePrice(unitWithScreen)
+        Dim resultWithout = _service.CalculatePrice(unitWithoutScreen)
+
+        Assert.Equal(resultWith, resultWithout)
     End Sub
 
 End Class

@@ -69,6 +69,11 @@ Namespace Services
                                               panelsPerLite, "ea"))
                 End Select
 
+                ' --- Screen.
+                If lite.HasScreen Then
+                    items.Add(New BomItem(BomCategory.Screen, $"{label} screen mesh — {panelHeight}x{panelWidth}", Math.Round(panelHeight * panelWidth), "sq ft"))
+                End If
+
                 ' --- Hardware per frame type.
                 AddHardware(items, label, lite.FrameType)
             Next

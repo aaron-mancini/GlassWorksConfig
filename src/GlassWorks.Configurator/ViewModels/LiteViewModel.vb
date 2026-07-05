@@ -23,6 +23,7 @@ Namespace ViewModels
         Private _gridColumns As Integer = 2
         Private _glassType As GlassType = GlassType.DoublePane
         Private _tint As GlassTint = GlassTint.Clear
+        Private _hasScreen As Boolean = False
 
         ''' <summary>Position label ("Lite 2 · Casement"), maintained by MainViewModel.</summary>
         Public Property DisplayName As String
@@ -117,6 +118,18 @@ Namespace ViewModels
             End Set
         End Property
 
+        Public Property HasScreen As Boolean
+            Get
+                Return _hasScreen
+            End Get
+            Set(value As Boolean)
+                If SetProperty(_hasScreen, value) Then
+                    OnPropertyChanged(NameOf(HasScreen))
+                    NotifySummaryAndErrorChanged()
+                End If
+            End Set
+        End Property
+
         ''' <summary>Drives visibility of the rows/columns editor in the view.</summary>
         Public ReadOnly Property IsColonial As Boolean
             Get
@@ -190,6 +203,13 @@ Namespace ViewModels
             End Get
         End Property
 
+        Public ReadOnly Property CanHaveScreen As Boolean
+            Get
+                OnPropertyChanged(NameOf(FrameType))
+                Return FrameTypeCatalog.GetSpec(FrameType).SupportsScreen
+            End Get
+        End Property
+
         Private Function ValidateProperty(columnName As String) As String
             Dim spec = FrameTypeCatalog.GetSpec(_frameType)
             Dim typeName = _frameType.GetDescription()
@@ -229,7 +249,8 @@ Namespace ViewModels
                 .GridRows = _gridRows,
                 .GridColumns = _gridColumns,
                 .GlassType = _glassType,
-                .Tint = _tint
+                .Tint = _tint,
+                .HasScreen = _hasScreen
             }
         End Function
 
