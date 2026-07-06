@@ -23,6 +23,7 @@ Namespace ViewModels
         Private _gridColumns As Integer = 2
         Private _glassType As GlassType = GlassType.DoublePane
         Private _tint As GlassTint = GlassTint.Clear
+        Private _hasScreen As Boolean = False
 
         ''' <summary>Position label ("Lite 2 · Casement"), maintained by MainViewModel.</summary>
         Public Property DisplayName As String
@@ -46,6 +47,8 @@ Namespace ViewModels
                     OnPropertyChanged(NameOf(WidthInches))
                     OnPropertyChanged(NameOf(HeightInches))
                     OnPropertyChanged(NameOf(SizeRangeHint))
+                    OnPropertyChanged(NameOf(CanHaveScreen))
+                    If CanHaveScreen = False Then HasScreen = False
                     NotifySummaryAndErrorChanged()
                 End If
             End Set
@@ -114,6 +117,18 @@ Namespace ViewModels
             End Get
             Set(value As GlassTint)
                 SetProperty(_tint, value)
+            End Set
+        End Property
+
+        Public Property HasScreen As Boolean
+            Get
+                Return _hasScreen
+            End Get
+            Set(value As Boolean)
+                If SetProperty(_hasScreen, value) Then
+                    OnPropertyChanged(NameOf(CanHaveScreen))
+                    NotifySummaryAndErrorChanged()
+                End If
             End Set
         End Property
 
@@ -190,6 +205,12 @@ Namespace ViewModels
             End Get
         End Property
 
+        Public ReadOnly Property CanHaveScreen As Boolean
+            Get
+                Return FrameTypeCatalog.GetSpec(FrameType).SupportsScreen
+            End Get
+        End Property
+
         Private Function ValidateProperty(columnName As String) As String
             Dim spec = FrameTypeCatalog.GetSpec(_frameType)
             Dim typeName = _frameType.GetDescription()
@@ -229,7 +250,8 @@ Namespace ViewModels
                 .GridRows = _gridRows,
                 .GridColumns = _gridColumns,
                 .GlassType = _glassType,
-                .Tint = _tint
+                .Tint = _tint,
+                .HasScreen = _hasScreen
             }
         End Function
 

@@ -61,6 +61,7 @@ Namespace Services
         Public Const ColonialChargePerOpening As Decimal = 2.5D
         Public Const PrairieChargePerLite As Decimal = 16D
         Public Const MullChargePerJoint As Decimal = 32.5D
+        Public Const ScreenRatePerSqFt As Decimal = 18D
 
         ' --- Engine -----------------------------------------------------------
 
@@ -110,9 +111,14 @@ Namespace Services
                     Case GridPattern.Prairie
                         lines.Add(New PriceLine($"{label} grid — Prairie", PrairieChargePerLite))
                 End Select
+
+                ' 4) Screens.
+                If lite.HasScreen And FrameTypeCatalog.GetSpec(lite.FrameType).SupportsScreen Then
+                    lines.Add(New PriceLine($"{label} screen", CDec(Math.Round(ScreenRatePerSqFt * CDec(lite.AreaSquareFeet), 2))))
+                End If
             Next
 
-            ' 4) Mulling: joining n lites needs n−1 structural mull joints.
+            ' 5) Mulling: joining n lites needs n−1 structural mull joints.
             If unit.MullJointCount > 0 Then
                 lines.Add(New PriceLine(
                     $"Mulling — {unit.MullJointCount} joint(s) × {MullChargePerJoint:0.00}",

@@ -135,6 +135,11 @@
                             <TextBlock Text="{Binding SizeRangeHint}" Style="{StaticResource HintText}"
                                        Margin="90,0,0,10" />
 
+							<DockPanel Margin="0,0,0,8">
+								<TextBlock Text="Screen" Style="{StaticResource FieldLabelText}" Width="80" />
+								<CheckBox IsChecked="{Binding HasScreen}" IsEnabled="{Binding CanHaveScreen}"></CheckBox>
+							</DockPanel>
+
                             <DockPanel Margin="0,0,0,8">
                                 <TextBlock Text="Glass" Style="{StaticResource FieldLabelText}" Width="80" />
                                 <ComboBox ItemsSource="{x:Static vm:EnumCatalog.GlassTypes}"

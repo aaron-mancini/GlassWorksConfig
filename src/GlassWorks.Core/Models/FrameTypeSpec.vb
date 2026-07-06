@@ -25,12 +25,14 @@ Namespace Models
 
         ''' <summary>Number of operable sash panels (0 for fixed units).</summary>
         Public ReadOnly Property SashCount As Integer
+        Public ReadOnly Property SupportsScreen As Boolean
 
         Public Sub New(frameType As FrameType,
                        minWidth As Double, maxWidth As Double,
                        minHeight As Double, maxHeight As Double,
                        glassDeductionPerSide As Double,
-                       sashCount As Integer)
+                       sashCount As Integer,
+                       supportsScreen As Boolean)
             ' VB idiom: 'Me' is C#'s 'this'. Assignments below disambiguate the
             ' property from the same-named parameter exactly as 'this.x = x' would.
             Me.FrameType = frameType
@@ -40,6 +42,7 @@ Namespace Models
             Me.MaxHeightInches = maxHeight
             Me.GlassDeductionPerSideInches = glassDeductionPerSide
             Me.SashCount = sashCount
+            Me.SupportsScreen = supportsScreen
         End Sub
 
         ''' <summary>Human-readable size range, used as a hint in the UI.</summary>
@@ -64,11 +67,11 @@ Namespace Models
         ' and a collection initializer. Dictionary initializers use nested braces
         ' {key, value} rather than C#'s {key, value} / [key] = value forms.
         Private ReadOnly Specs As New Dictionary(Of FrameType, FrameTypeSpec) From {
-            {FrameType.Fixed, New FrameTypeSpec(FrameType.Fixed, 12, 120, 12, 96, glassDeductionPerSide:=1.75, sashCount:=0)},
-            {FrameType.Casement, New FrameTypeSpec(FrameType.Casement, 14, 36, 24, 72, glassDeductionPerSide:=3.0, sashCount:=1)},
-            {FrameType.DoubleHung, New FrameTypeSpec(FrameType.DoubleHung, 20, 48, 36, 84, glassDeductionPerSide:=3.25, sashCount:=2)},
-            {FrameType.Slider, New FrameTypeSpec(FrameType.Slider, 36, 84, 24, 60, glassDeductionPerSide:=3.0, sashCount:=2)},
-            {FrameType.Awning, New FrameTypeSpec(FrameType.Awning, 18, 48, 14, 36, glassDeductionPerSide:=3.0, sashCount:=1)}
+            {FrameType.Fixed, New FrameTypeSpec(FrameType.Fixed, 12, 120, 12, 96, glassDeductionPerSide:=1.75, sashCount:=0, False)},
+            {FrameType.Casement, New FrameTypeSpec(FrameType.Casement, 14, 36, 24, 72, glassDeductionPerSide:=3.0, sashCount:=1, True)},
+            {FrameType.DoubleHung, New FrameTypeSpec(FrameType.DoubleHung, 20, 48, 36, 84, glassDeductionPerSide:=3.25, sashCount:=2, True)},
+            {FrameType.Slider, New FrameTypeSpec(FrameType.Slider, 36, 84, 24, 60, glassDeductionPerSide:=3.0, sashCount:=2, True)},
+            {FrameType.Awning, New FrameTypeSpec(FrameType.Awning, 18, 48, 14, 36, glassDeductionPerSide:=3.0, sashCount:=1, True)}
         }
         ' VB idiom above: 'glassDeductionPerSide:=1.75' is a named argument -
         ' VB uses ':=' where C# uses ':' (glassDeductionPerSide: 1.75).

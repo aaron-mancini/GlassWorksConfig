@@ -9,6 +9,7 @@ Namespace Models
         <ComponentModel.Description("Grid")> Grid
         <ComponentModel.Description("Hardware")> Hardware
         <ComponentModel.Description("Mulling")> Mulling
+        <ComponentModel.Description("Screen")> Screen
     End Enum
 
     ''' <summary>

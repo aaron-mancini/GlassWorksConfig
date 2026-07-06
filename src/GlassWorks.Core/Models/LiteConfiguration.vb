@@ -13,6 +13,7 @@ Namespace Models
         Public Property WidthInches As Double = 24
         Public Property HeightInches As Double = 48
         Public Property GridPattern As GridPattern = GridPattern.None
+        Public Property HasScreen As Boolean = False
 
         ''' <summary>Rows of grid openings when the pattern is Colonial.</summary>
         Public Property GridRows As Integer = 2

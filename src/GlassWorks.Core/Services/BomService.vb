@@ -69,6 +69,11 @@ Namespace Services
                                               panelsPerLite, "ea"))
                 End Select
 
+                ' --- Screen.
+                If lite.HasScreen And FrameTypeCatalog.GetSpec(lite.FrameType).SupportsScreen Then
+                    items.Add(New BomItem(BomCategory.Screen, $"{label} screen mesh — {panelWidth}x{panelHeight}", Math.Round(panelWidth * panelHeight) / 144, "sq ft"))
+                End If
+
                 ' --- Hardware per frame type.
                 AddHardware(items, label, lite.FrameType)
             Next
@@ -133,16 +138,13 @@ Namespace Services
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} casement hinge set", 2, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} crank operator", 1, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} multi-point lock", 1, "ea"))
-                    items.Add(New BomItem(BomCategory.Hardware, $"{label} insect screen", 1, "ea"))
                 Case FrameType.DoubleHung
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} sash balance", 2, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} cam lock + keeper", 2, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} tilt latch pair", 2, "ea"))
-                    items.Add(New BomItem(BomCategory.Hardware, $"{label} insect screen", 1, "ea"))
                 Case FrameType.Slider
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} roller assembly", 2, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} sweep latch", 1, "ea"))
-                    items.Add(New BomItem(BomCategory.Hardware, $"{label} insect screen", 1, "ea"))
                 Case FrameType.Awning
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} awning hinge set", 2, "ea"))
                     items.Add(New BomItem(BomCategory.Hardware, $"{label} push-out operator", 1, "ea"))
